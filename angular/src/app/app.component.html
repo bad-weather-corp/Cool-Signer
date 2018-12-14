@@ -1,0 +1,8 @@
+<div [hidden]="!isScanning">
+    <app-scanner (scanResult)="scanResult($event)" [scanning]="isScanning"></app-scanner>
+</div>
+<div [hidden]="!scanData">
+    <h2>Scanned data</h2>
+    <pre>{{scanData}}</pre>
+    <ngx-kjua [text]="scanData"></ngx-kjua>
+</div>
