@@ -10,13 +10,23 @@ Clone the repo and cd to angular directory. Then install node modules
 
 `npm install`
 
+Now cd to the /cordova directory and run
+
+`cordova prepare`
+
 ### Build
+
+#### Build angular app
 
 To build the app run
 
 `ng build --prod`
 
 App will be placed to /cordova/www directory
+
+#### Build cordova app
+
+Make sure you have JAVA_HOME and ANDROID_HOME defined.
 
 ### Run the app
 
