@@ -1,4 +1,8 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, Input, ViewChild } from '@angular/core';
+import { CordovaService } from 'src/app/services/cordova.service';
+import { PermissionsService } from 'src/app/services/permissions.service';
+import { ZXingScannerComponent } from '@zxing/ngx-scanner';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-scanner',
@@ -6,17 +10,22 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, Input } from '@angu
   styleUrls: ['./scanner.component.css']
 })
 export class ScannerComponent implements OnInit, OnDestroy {
-
+  // emitter for the result of the scanning
   @Output() scanResult = new EventEmitter<string>();
+  // currently selected camera device
+  selectedDevice: MediaDeviceInfo;
+
+  private ANDROID_PERMISSIONS = ['android.permission.CAMERA'];
+
   private _scanning = false;
-
   private availableDevices: MediaDeviceInfo[];
-  private selectedDevice: MediaDeviceInfo;
 
-  constructor() { }
+  constructor(private permissions: PermissionsService) { }
 
   ngOnInit() {
-
+    this.permissions.requestPermissions(this.ANDROID_PERMISSIONS).subscribe((result) => {
+      console.log('Permission request done: ' + JSON.stringify(result));
+    });
   }
 
   ngOnDestroy() {

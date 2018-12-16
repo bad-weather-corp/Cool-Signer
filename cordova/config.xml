@@ -24,6 +24,7 @@
         <allow-intent href="itms-apps:*" />
     </platform>
     <hook src="scripts/hook_after_prepare.js" type="after_prepare" />
+    <plugin name="cordova-plugin-android-permissions" spec="^1.0.0" />
     <engine name="browser" spec="^5.0.4" />
     <engine name="android" spec="^7.1.4" />
 </widget>
