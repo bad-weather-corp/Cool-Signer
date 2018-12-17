@@ -27,16 +27,16 @@ export class PermissionsService {
   /**
    * Ask for permissions and return true if hey were acquired, false if failed and undefined if already present
    *
-   * @param permissions array of android permissions that need to be acquired
+   * @param permission android permission that needs to be acquired
    */
-  public requestPermissions(permissions: string[]): Observable<PermissionResult> {
+  public requestPermission(permission: string): Observable<PermissionResult> {
     const permObj = this.getPermissionsObject();
     // create observable for the result of permission request
     return Observable.create(observer => {
       // behave based on whether we have the permissions object or not
       if (permObj) {
         // check for permission and register callback function to process it
-        permObj.checkPermission(permissions, processPermissionCheck);
+        permObj.checkPermission(permission, processPermissionCheck);
       } else {
         // not having any permission system means we have all the permissions
         observer.next({usingPermissions: false, requestedPermissions: false, hasPermissions: true});
@@ -47,12 +47,12 @@ export class PermissionsService {
         if (resp.hasPermission) {
           observer.next({usingPermissions: true, requestedPermissions: false, hasPermissions: true});
         } else {
-          requestPermissions();
+          requestPermission();
         }
       }
       // request the permissions
-      function requestPermissions() {
-        permObj.requestPermissions(permissions, (resp) => {
+      function requestPermission() {
+        permObj.requestPermission(permission, (resp) => {
           if (resp.hasPermission) {
             observer.next({usingPermissions: true, requestedPermissions: true, hasPermissions: true});
           } else {

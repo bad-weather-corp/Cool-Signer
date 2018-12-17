@@ -1,8 +1,5 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter, Input, ViewChild } from '@angular/core';
-import { CordovaService } from 'src/app/services/cordova.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
-import { ZXingScannerComponent } from '@zxing/ngx-scanner';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-scanner',
@@ -14,16 +11,16 @@ export class ScannerComponent implements OnInit, OnDestroy {
   @Output() scanResult = new EventEmitter<string>();
   // currently selected camera device
   selectedDevice: MediaDeviceInfo;
+  availableDevices: MediaDeviceInfo[];
 
-  private ANDROID_PERMISSIONS = ['android.permission.CAMERA'];
+  private CAMERA_PERMISSION = 'android.permission.CAMERA';
 
   private _scanning = false;
-  private availableDevices: MediaDeviceInfo[];
 
   constructor(private permissions: PermissionsService) { }
 
   ngOnInit() {
-    this.permissions.requestPermissions(this.ANDROID_PERMISSIONS).subscribe((result) => {
+    this.permissions.requestPermission(this.CAMERA_PERMISSION).subscribe((result) => {
       console.log('Permission request done: ' + JSON.stringify(result));
     });
   }
@@ -37,9 +34,9 @@ export class ScannerComponent implements OnInit, OnDestroy {
   set scanning(scanning: boolean) {
     this._scanning = scanning;
     if (scanning) {
-      this.selectCamera();
+      this.autoSelectCamera();
     } else {
-      this.selectedDevice = undefined;
+      this.selectCamera(undefined);
     }
   }
   get scanning(): boolean {
@@ -52,9 +49,10 @@ export class ScannerComponent implements OnInit, OnDestroy {
    * @param devices array of recognized media devices
    */
   camerasFound(devices: MediaDeviceInfo[]) {
+    devices.forEach(dvc => console.log(`Found camera: ${dvc.deviceId}, ${dvc.groupId}, ${dvc.kind}, ${dvc.label}`));
     this.availableDevices = devices;
     // auto-select the camera
-    this.selectCamera();
+    this.autoSelectCamera();
   }
 
   /**
@@ -68,7 +66,7 @@ export class ScannerComponent implements OnInit, OnDestroy {
   /**
    * try to pick the back camera or take the first one in the list
    */
-  selectCamera() {
+  autoSelectCamera() {
     const devices = this.availableDevices;
     // if devices were not loaded yet then do nothing
     if (!devices || devices.length === 0) {
@@ -77,13 +75,22 @@ export class ScannerComponent implements OnInit, OnDestroy {
     // selects the devices's back camera by default
     for (const device of devices) {
       if (/back|rear|environment/gi.test(device.label)) {
-        this.selectedDevice = device;
+        this.selectCamera(device);
         break;
       }
     }
     // if back camera was not found then simply use the first in the list
     if (!this.selectedDevice) {
-      this.selectedDevice = devices[0];
+      this.selectCamera(devices[0]);
     }
+  }
+
+  selectCamera(device: MediaDeviceInfo) {
+    this.selectedDevice = device;
+  }
+
+  selectCameraById(deviceId: string) {
+    const device = this.availableDevices.find((value) => value.deviceId === deviceId);
+    this.selectCamera(device);
   }
 }

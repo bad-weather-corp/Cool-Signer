@@ -1,1 +1,9 @@
+<div>
+    <select (change)="selectCameraById($event.target.value)">
+        <option value="" [selected]="!selectedDevice">No Device Selected</option>
+        <option *ngFor="let device of availableDevices" [value]="device.deviceId" [selected]="selectedDevice && device.deviceId === selectedDevice.deviceId">{{
+            device.label }}</option>
+    </select>
+</div>
+
 <zxing-scanner [device]="selectedDevice" (scanSuccess)="scanSuccess($event)" (camerasFound)="camerasFound($event)"></zxing-scanner>
